@@ -95,7 +95,7 @@ we map floats in [0,1] to bytes in [0,255].  Then we copy this to every color
 channel.  The result is a 3-dimensional array, indexed by (row, column,
 channel).  `repa-devil` takes such an array and outputs a PNG image file.
 
-> toImage :: Array DIM2 R -> Array DIM3 Word8
+> toImage :: Array R.D DIM2 R -> Array R.D DIM3 Word8
 > toImage arr = R.traverse arr8 (:. 4) chans where
 >     arr8 = R.map (floor . (*255) . min 1 . max 0) arr
 >     chans _ (Z :. _ :. _ :. 3) = 255  -- alpha channel
@@ -104,7 +104,8 @@ channel).  `repa-devil` takes such an array and outputs a PNG image file.
 > main :: IO ()
 > main = do
 >     let arr = R.fromFunction (Z :. pixels :. pixels) quasicrystal
->     D.runIL $ D.writeImage "out.png" (toImage arr)
+>     img <- R.copyP $ toImage arr
+>     D.runIL $ D.writeImage "out.png" $ D.RGBA img
 
 
 Running it
